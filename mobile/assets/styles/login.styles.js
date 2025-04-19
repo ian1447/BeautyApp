@@ -8,7 +8,6 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: COLORS.background,
-    padding: 20,
     justifyContent: "center",
   },
   scrollViewStyle: {
@@ -18,23 +17,27 @@ const styles = StyleSheet.create({
   topIllustration: {
     alignItems: "center",
     width: "100%",
+    paddingBottom: 125,
+    paddingTop: 125,
   },
   illustrationImage: {
-    width: width * 0.75,
-    height: width * 0.75,
+    width: width * 0.25,
+    height: width * 0.25,
   },
   card: {
     backgroundColor: COLORS.cardBackground,
-    borderRadius: 16,
-    padding: 24,
+    // borderRadius: 50,
+    borderTopRightRadius: 100,
+    padding: 30,
     shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
-    elevation: 4,
     borderWidth: 2,
     borderColor: COLORS.border,
     marginTop: -24,
+    width: "100%",
+    flex: 1,
   },
   header: {
     alignItems: "center",
@@ -63,6 +66,14 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     fontWeight: "500",
   },
+  labelLogin: {
+    fontSize: 45,
+    fontWeight: "bold",
+    marginBottom: 8,
+    color: COLORS.textPrimary,
+    fontWeight: "500",
+    textAlign: "center",
+  },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -84,7 +95,8 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   button: {
-    backgroundColor: COLORS.primary,
+    // backgroundColor: COLORS.primary,
+    backgroundColor: "black",
     borderRadius: 12,
     height: 50,
     justifyContent: "center",

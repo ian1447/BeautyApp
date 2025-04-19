@@ -25,7 +25,7 @@ export default function Login() {
 
   const handleLogin = async () => {
     const result = await login(email,password);
-
+    
     if (!result.success) Alert.alert("error", result.error);
 
   };
@@ -36,7 +36,7 @@ export default function Login() {
       <View style={styles.container}>
         <View style={styles.topIllustration}>
           <Image
-            source={require("../../assets/images/i2.png")}
+            source={require("../../assets/images/loginlogo.png")}
             style={styles.illustrationImage}
             resizeMode="contain"
           />
@@ -44,6 +44,7 @@ export default function Login() {
 
         <View style={styles.card}>
           <View style={styles.formContainer}>
+          <Text style={styles.labelLogin} >Login</Text>
             {/* For email */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Email</Text>
