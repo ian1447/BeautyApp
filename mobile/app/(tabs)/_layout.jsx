@@ -8,7 +8,7 @@ export default function Tablayout() {
   return (
     <Tabs
       screenOptions={{
-        headerShown: false, 
+        headerShown: false,
         tabBarActiveTintColor: "#007AFF",
         tabBarInactiveTintColor: "gray",
         tabBarLabelStyle: {
@@ -17,6 +17,12 @@ export default function Tablayout() {
         },
         tabBarIconStyle: {
           marginBottom: -4,
+        },
+        tabBarStyle: {
+          backgroundColor: "#f7b2d9",
+          borderTopWidth: 0, 
+          elevation: 5,
+          shadowColor: "#000",
         },
       }}
     >
