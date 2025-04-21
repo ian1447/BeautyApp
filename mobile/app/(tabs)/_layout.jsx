@@ -20,7 +20,7 @@ export default function Tablayout() {
         },
         tabBarStyle: {
           backgroundColor: "#f7b2d9",
-          borderTopWidth: 0, 
+          borderTopWidth: 0,
           elevation: 5,
           shadowColor: "#000",
         },
@@ -54,6 +54,12 @@ export default function Tablayout() {
           tabBarIcon: ({ focused, color }) => <Octicons name="person-fill" size={focused ? 30 : 24} color={color} />,
           tabBarLabel: ({ focused, color }) => <Text style={{ color, fontWeight: focused ? "bold" : "normal", fontSize: 12 }}>Profile</Text>,
         }}
+      />{" "}
+      <Tabs.Screen
+         name="(userpages)/beautician"
+         options={{
+           href: null,
+         }}
       />
     </Tabs>
   );
