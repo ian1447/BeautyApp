@@ -34,7 +34,7 @@ export default function Home() {
   const router = useRouter();
   
   return (
-    <View>
+    <View style={styles.fullScreenContainer}>
       <View style={styles.container}>
         <Text style={styles.text_header}>Welcome {user?.username}!!</Text>
 
@@ -75,10 +75,15 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
+  fullScreenContainer: {
+    flex: 1,
+    backgroundColor: "#fef2fe"
+  },
   container: {
     flexGrow: 1,
     padding: 16,
     textAlign: "center",
+    backgroundColor: "#fef2fe"
   },
   text_header: {
     textAlign: "auto",

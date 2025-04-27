@@ -3,7 +3,7 @@ import cors from "cors";
 import "dotenv/config";
 
 import authRoutes from "./routes/authRoutes.js";
-import bookRoutes from "./routes/bookRoute.js"
+import beauticianRoutes from "./routes/beauticianRoute.js";
 
 import { connectDB } from "./lib/db.js";
 
@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/api/auth", authRoutes)
-app.use("/api/books", bookRoutes)
+app.use("/api/beautician", beauticianRoutes)
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
