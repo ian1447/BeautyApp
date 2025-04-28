@@ -40,7 +40,7 @@ export default function Beautician() {
   // },[beauticians])
 
   const handlePress = (id) => {
-    router.push(`/beauticianProfiles/${id}`);
+    router.push(`/${id}`);
   };
   
   const renderBeautician = ({ item }) => (
