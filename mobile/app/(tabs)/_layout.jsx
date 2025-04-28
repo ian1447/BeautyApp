@@ -62,7 +62,7 @@ export default function Tablayout() {
          }}
       />
        <Tabs.Screen
-         name="beauticianProfiles/[id]"
+         name="(userpages)/[id]"
          options={{
            href: null,
          }}
