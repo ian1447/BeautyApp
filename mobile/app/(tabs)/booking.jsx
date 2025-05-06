@@ -1,10 +1,10 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 
-export default function Feed() {
+export default function Booking() {
   return (
     <View>
-      <Text>feed tabs</Text>
+      <Text>booking tabs</Text>
     </View>
   )
 }

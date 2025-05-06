@@ -42,10 +42,10 @@ export default function Tablayout() {
         }}
       />
       <Tabs.Screen
-        name="feed"
+        name="booking"
         options={{
           tabBarIcon: ({ focused, color }) => <MaterialIcons name="feed" size={focused ? 30 : 24} color={color} />,
-          tabBarLabel: ({ focused, color }) => <Text style={{ color, fontWeight: focused ? "bold" : "normal", fontSize: 12 }}>Feed</Text>,
+          tabBarLabel: ({ focused, color }) => <Text style={{ color, fontWeight: focused ? "bold" : "normal", fontSize: 12 }}>Booking</Text>,
         }}
       />
       <Tabs.Screen
@@ -63,6 +63,12 @@ export default function Tablayout() {
       />
        <Tabs.Screen
          name="(userpages)/[id]"
+         options={{
+           href: null,
+         }}
+      />
+      <Tabs.Screen
+         name="(chat)/[id]"
          options={{
            href: null,
          }}
