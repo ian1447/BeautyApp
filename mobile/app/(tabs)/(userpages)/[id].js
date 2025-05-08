@@ -33,6 +33,12 @@ export default function BeauticianProfile() {
   const params = useLocalSearchParams();
   const { id } = params;
 
+  const goToChat = (id: string) => {
+    console.log(id);
+    
+    router.push(`/(chat)/${id}`);
+  };
+
   const renderItem = ({ item }) => (
     <View>
       <View style={styles.imageContainer}>
@@ -131,9 +137,9 @@ export default function BeauticianProfile() {
           <View style={styles.buttonGroup}>
             <TouchableOpacity
               style={styles.secondaryButton}
-              onPress={() => alert("More Info")}
+              onPress={() => goToChat(id)} 
             >
-              <Text style={styles.bookButtonText}>Info</Text>
+              <Text style={styles.bookButtonText}>Chat</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.bookButton}

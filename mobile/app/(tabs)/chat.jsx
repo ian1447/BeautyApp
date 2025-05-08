@@ -22,7 +22,7 @@ export default function Chat() {
   const goToChat = (id: string) => {
     console.log(id);
     
-    // router.push(`/chat/${id}`);
+    router.push(`/(chat)/${id}`);
   };
 
   return (
