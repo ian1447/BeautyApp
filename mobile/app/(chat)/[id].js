@@ -1,37 +1,56 @@
-import { View, Text, FlatList, TextInput, Button, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  TextInput,
+  Button,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { useMemo } from "react";
+import dayjs from "dayjs";
 
 export const unstable_settings = {
   initialRouteName: "chat/[id]",
 };
 
 export default function ChatPage() {
+  const navigation = useNavigation();
   const { id } = useLocalSearchParams(); // Get the chat ID from the route parameters
   const [messages, setMessages] = useState([
     {
       id: "1",
       sender: "User",
       text: "asd!",
-      timestamp: "09:15 AM",
+      datetime: "2025-05-09T09:15:00", // ISO format
     },
     {
       id: "2",
       sender: "Beautician",
       text: "Hi there! How can I assist you today?",
-      timestamp: "09:16 AM",
+      datetime: "2025-05-09T09:16:00",
     },
   ]);
   const [newMessage, setNewMessage] = useState("");
 
+  const sortedMessages = useMemo(() => {
+    return [...messages].sort(
+      (a, b) => new Date(b.datetime) - new Date(a.datetime)
+    );
+  }, [messages]);
+
   const handleSendMessage = () => {
     if (newMessage.trim()) {
+      const now = new Date();
       const newMessageObject = {
         id: (messages.length + 1).toString(),
         sender: "User",
         text: newMessage,
-        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        datetime: now.toISOString(), // standardized ISO format
       };
       setMessages((prevMessages) => [...prevMessages, newMessageObject]);
       setNewMessage("");
@@ -49,12 +68,21 @@ export default function ChatPage() {
       </View>
 
       <FlatList
-        data={messages}
+        data={sortedMessages}
         renderItem={({ item }) => (
-          <View style={[styles.messageContainer, item.sender === "User" ? styles.userMessage : styles.receiverMessage]}>
+          <View
+            style={[
+              styles.messageContainer,
+              item.sender === "User"
+                ? styles.userMessage
+                : styles.receiverMessage,
+            ]}
+          >
             <Text style={styles.messageSender}>{item.sender}:</Text>
             <Text style={styles.messageText}>{item.text}</Text>
-            {item.timestamp && <Text style={styles.timestamp}>{item.timestamp}</Text>}
+            <Text style={styles.timestamp}>
+              {dayjs(item.datetime).format("MMM D, YYYY h:mm A")}
+            </Text>
           </View>
         )}
         keyExtractor={(item) => item.id}
@@ -62,7 +90,12 @@ export default function ChatPage() {
         style={styles.messageList}
       />
       <View style={styles.inputContainer}>
-        <TextInput style={styles.textInput} value={newMessage} onChangeText={setNewMessage} placeholder="Type a message..." />
+        <TextInput
+          style={styles.textInput}
+          value={newMessage}
+          onChangeText={setNewMessage}
+          placeholder="Type a message..."
+        />
 
         <TouchableOpacity onPress={handleSendMessage} style={styles.sendButton}>
           <Ionicons name="send" size={28} color="#EC7FA9" margin />
