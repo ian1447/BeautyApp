@@ -8,28 +8,27 @@ const router = express.Router();
 // update
 // delete
 
-// router.post("/", protectRoute, async (req, res) => {
-//   try {
-//     const { title, caption, rating } = req.body;
+router.post("/", protectRoute, async (req, res) => {
+  try {
+    const { chat_text, beautician_id, user_id } = req.body;
 
-//     if (!title || !caption || !rating) res.status(400).json({ message: "Please Provide all necessary details." });
+    if (!chat_text || !beautician_id || !user_id) res.status(400).json({ message: "Please Provide all necessary details." });
 
-//     const newBook = new Book({
-//       title,
-//       caption,
-//       rating,
-//       user: req.user._id,
-//     });
+    const newchat = new Chat({
+      chat_text,
+      beautician_id,
+      user_id
+    });
 
-//     await newBook.save();
+    await newchat.save();
 
-//     res.status(201).json({ newBook });
-//   } catch (error) {
-//     console.log("error", error);
+    res.status(201).json({ newchat });
+  } catch (error) {
+    console.log("error", error);
 
-//     res.status(500).json({ message: error.message });
-//   }
-// });
+    res.status(500).json({ message: error.message });
+  }
+});
 
 // router.get("/", protectRoute, async (req, res) => {
 //   try {

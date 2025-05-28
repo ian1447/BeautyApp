@@ -18,20 +18,21 @@ export default function RootLayout() {
   useEffect(()=>{ 
     const inAuthScreen = segments[0] ==="(auth)";
     const isSignedIn = user && token;
+    console.log(user);
+    
 
     if (!isSignedIn && !inAuthScreen) router.replace("/(auth)");
     else if (isSignedIn && inAuthScreen && user.role === "user") router.replace("/(tabs)")
-    else if (isSignedIn && inAuthScreen && user.role === "admin") router.replace("/(auth)")
+    else if (isSignedIn && inAuthScreen && user.role !== "user") router.replace("/(admin)")
   },[user,token,segments])
 
   return (
     <SafeAreaProvider>
       <SafeScreen>
         <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(admin)" />
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="(auth)" />
-          {/* <Stack.Screen name="(chat)" /> */}
-          {/* <Stack.Screen name="(auth)/beauticianProfiles" /> */}
         </Stack>
         <StatusBar barStyle={"dark-content"} />
       </SafeScreen>

@@ -13,7 +13,7 @@ router.post("/register", async (req, res) => {
     if (!req.body) {
       return res.status(400).json({ error: "Request body is missing" });
     }
-    console.log("req", req.body);
+    // console.log("req", req.body);
     const { email, username, password } = req.body;
     if (!username || !email || !password) {
       return res.status(400).json({ message: "Missing Requirements" });
@@ -94,7 +94,8 @@ router.post("/login", async (req, res) => {
         username: user.username,
         email: user.email,
         profileImage: user.profileImage,
-        role: user.role
+        role: user.role,
+        beautician: user.beautician_id
       },
     });
   } catch (error) {
