@@ -29,9 +29,10 @@ export default function ChatPage() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
 
-  const GetChats = async () => {
-    const user_id = user.id;
-    const beautician_id = id;
+  const GetChats= async () => {
+    const user_id = user.role === "user" ? user.id:id;
+    const beautician_id = user.role === "user" ? id: user.beautician;
+    
     try {
       const resp = await fetch(
         `${API_URL}/api/chat?user_id=${user_id}&beautician_id=${beautician_id}`,
@@ -44,6 +45,7 @@ export default function ChatPage() {
         }
       );
       const data = await resp.json();
+      
       if (Array.isArray(data)) {
         setMessages(data);
       } else {
@@ -76,10 +78,10 @@ export default function ChatPage() {
   const handleSendMessage = () => {
     const newMessageSend = async () => {
       try {
-        const user_id = user.id;
+        const user_id = user.role === "user" ? user.id:id;
         const chat_text = newMessage;
-        const beautician_id = id;
-        const sender = "User";
+        const beautician_id =  user.role === "user" ? id: user.beautician;
+        const sender = user.role === "user" ? "user" : "beautician";
         const response = await fetch(`${API_URL}/api/chat`, {
           method: "POST",
           headers: {
@@ -99,6 +101,7 @@ export default function ChatPage() {
         if (!response.ok)
           throw new Error(data.message || "Something went wrong");
         else {
+          setNewMessage("");
           GetChats();
         }
       } catch (error) {
@@ -114,7 +117,7 @@ export default function ChatPage() {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={30} color="black" />
         </TouchableOpacity>
-        <Text style={styles.beauticianName}>asd</Text>
+        <Text style={styles.beauticianName}>{messages[0].user_id.username}</Text>
         <View style={{ width: 60 }} />
       </View>
 
@@ -124,9 +127,11 @@ export default function ChatPage() {
           <View
             style={[
               styles.messageContainer,
-              item.sender === "User"
+              user.role === "user" ?  item.sender === "user" 
                 ? styles.userMessage
-                : styles.receiverMessage,
+                : styles.receiverMessage:item.sender === "user" 
+                ? styles.receiverMessage
+                : styles.userMessage,
             ]}
           >
             <Text style={styles.messageSender}>{item.sender}:</Text>

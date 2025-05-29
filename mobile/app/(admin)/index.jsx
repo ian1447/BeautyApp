@@ -6,6 +6,7 @@ import { API_URL } from "../../constants/api";
 import { useAuthStore } from "../../store/authStore";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
+import dayjs from "dayjs";
 
 export default function Chat() {
   const router = useRouter();
@@ -32,6 +33,8 @@ export default function Chat() {
         }
       );
       const data = await resp.json();
+      console.log("data",data);
+      
       if (Array.isArray(data)) {
         setChatList(data);
       } else {
@@ -58,10 +61,10 @@ export default function Chat() {
     <View style={styles.fullScreenContainer}>
       <FlatList
         data={chatList}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
           <TouchableOpacity
-            onPress={() => goToChat(item.id)}
+            onPress={() => goToChat(item.user_id._id)}
             style={{
               flexDirection: "row",
               alignItems: "center",
@@ -104,9 +107,9 @@ export default function Chat() {
             </View>
 
             {/* Time */}
-            {/* <Text style={{ color: "#999", fontSize: 12, marginLeft: 8 }}>
-              {item.time}
-            </Text> */}
+            <Text style={{ color: "#999", fontSize: 12, marginLeft: 8 }}>
+              {dayjs(item.datetime).format("MMM D, YYYY h:mm A")}
+            </Text>
           </TouchableOpacity>
         )}
       />
