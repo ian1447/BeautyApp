@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {API_URL} from "../constants/api";
+import { API_URL } from "../constants/api";
 
 // const API_URL = "http://192.168.100.12:3000";
 
@@ -12,20 +12,17 @@ export const useAuthStore = create((set) => ({
   register: async (username, email, password) => {
     set({ isLoading: true });
     try {
-      const response = await fetch(
-        `${API_URL}/api/auth/register`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username,
-            email,
-            password,
-          }),
-        }
-      );
+      const response = await fetch(`${API_URL}/api/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          email,
+          password,
+        }),
+      });
 
       const data = await response.json();
 
@@ -45,33 +42,32 @@ export const useAuthStore = create((set) => ({
     }
   },
 
-  login: async (email,password) => {
-    set({isLoading: true});
+  login: async (email, password) => {
+    set({ isLoading: true });
     try {
-        const response = await fetch(
-            `${API_URL}/api/auth/login`,{
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    email,
-                    password,
-                  }),
-            });
-        
-        const data = await response.json();
-        
-        if (!response.ok) throw new Error(data.message || "Something went wrong");
+      const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
 
-        await AsyncStorage.setItem("user", JSON.stringify(data.user));
-        await AsyncStorage.setItem("token", data.token);
-        set({token: data.token, user: data.user, isLoading: false});
+      const data = await response.json();
 
-        return {success: true};
+      if (!response.ok) throw new Error(data.message || "Something went wrong");
+
+      await AsyncStorage.setItem("user", JSON.stringify(data.user));
+      await AsyncStorage.setItem("token", data.token);
+      set({ token: data.token, user: data.user, isLoading: false });
+
+      return { success: true };
     } catch (error) {
-        set({ isLoading: false });
-        return { success: false, error: error.message };
+      set({ isLoading: false });
+      return { success: false, error: error.message };
     }
   },
 
@@ -89,11 +85,9 @@ export const useAuthStore = create((set) => ({
 
   logout: async () => {
     try {
-        await AsyncStorage.removeItem("token");
-        await AsyncStorage.removeItem("user");
-        set({token: null, user:null});
-    } catch (error) {
-        
-    }
-  }
+      await AsyncStorage.removeItem("token");
+      await AsyncStorage.removeItem("user");
+      set({ token: null, user: null });
+    } catch (error) {}
+  },
 }));

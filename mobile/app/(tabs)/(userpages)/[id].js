@@ -12,6 +12,8 @@ import {
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useAuthStore } from "../../../store/authStore";
+import { API_URL } from "../../../constants/api";
 
 const { width, height } = Dimensions.get("window");
 
@@ -32,11 +34,46 @@ export default function BeauticianProfile() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { id } = params;
+  const { user, token } = useAuthStore();
+
+  useEffect(() => {
+    console.log(user.id);
+  });
 
   const goToChat = (id: string) => {
-    console.log(id);
-    
-    router.push(`/(chat)/${id}`);
+    const InitialChat = async () => {
+      try {
+        const user_id = user.id;
+        const chat_text = "Hi!";
+        const beautician_id = id;
+        const sender = "User";
+        const response = await fetch(`${API_URL}/api/chat`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            chat_text,
+            beautician_id,
+            user_id,
+            sender,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok)
+          throw new Error(data.message || "Something went wrong");
+        else {
+          console.log("asdf", id);
+          router.push(`/(chat)/${id}`);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    InitialChat();
   };
 
   const renderItem = ({ item }) => (
@@ -137,7 +174,7 @@ export default function BeauticianProfile() {
           <View style={styles.buttonGroup}>
             <TouchableOpacity
               style={styles.secondaryButton}
-              onPress={() => goToChat(id)} 
+              onPress={() => goToChat(id)}
             >
               <Text style={styles.bookButtonText}>Chat</Text>
             </TouchableOpacity>

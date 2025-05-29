@@ -8,11 +8,15 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo } from "react";
 import dayjs from "dayjs";
+import { useAuthStore } from "../../store/authStore";
+import { API_URL } from "../../constants/api";
+import { useFocusEffect } from "@react-navigation/native";
+import React, { useCallback } from 'react';
 
 export const unstable_settings = {
   initialRouteName: "chat/[id]",
@@ -20,41 +24,88 @@ export const unstable_settings = {
 
 export default function ChatPage() {
   const navigation = useNavigation();
-  const { id } = useLocalSearchParams(); // Get the chat ID from the route parameters
-  const [messages, setMessages] = useState([
-    {
-      id: "1",
-      sender: "User",
-      text: "asd!",
-      datetime: "2025-05-09T09:15:00", // ISO format
-    },
-    {
-      id: "2",
-      sender: "Beautician",
-      text: "Hi there! How can I assist you today?",
-      datetime: "2025-05-09T09:16:00",
-    },
-  ]);
+  const { id } = useLocalSearchParams();
+  const { user, token } = useAuthStore();
+  const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+
+  const GetChats = async () => {
+    const user_id = user.id;
+    const beautician_id = id;
+    try {
+      const resp = await fetch(
+        `${API_URL}/api/chat?user_id=${user_id}&beautician_id=${beautician_id}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await resp.json();
+      if (Array.isArray(data)) {
+        setMessages(data);
+      } else {
+        setMessages([]);
+      }
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      GetChats();
+
+      const interval = setInterval(() => {
+        GetChats();
+      }, 10000);
+
+      return () => clearInterval(interval);
+    }, [])
+  );
 
   const sortedMessages = useMemo(() => {
     return [...messages].sort(
-      (a, b) => new Date(b.datetime) - new Date(a.datetime)
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     );
   }, [messages]);
 
   const handleSendMessage = () => {
-    if (newMessage.trim()) {
-      const now = new Date();
-      const newMessageObject = {
-        id: (messages.length + 1).toString(),
-        sender: "User",
-        text: newMessage,
-        datetime: now.toISOString(), // standardized ISO format
-      };
-      setMessages((prevMessages) => [...prevMessages, newMessageObject]);
-      setNewMessage("");
-    }
+    const newMessageSend = async () => {
+      try {
+        const user_id = user.id;
+        const chat_text = newMessage;
+        const beautician_id = id;
+        const sender = "User";
+        const response = await fetch(`${API_URL}/api/chat`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            chat_text,
+            beautician_id,
+            user_id,
+            sender,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok)
+          throw new Error(data.message || "Something went wrong");
+        else {
+          GetChats();
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    newMessageSend();
   };
 
   return (
@@ -79,13 +130,13 @@ export default function ChatPage() {
             ]}
           >
             <Text style={styles.messageSender}>{item.sender}:</Text>
-            <Text style={styles.messageText}>{item.text}</Text>
+            <Text style={styles.messageText}>{item.chat_text}</Text>
             <Text style={styles.timestamp}>
               {dayjs(item.datetime).format("MMM D, YYYY h:mm A")}
             </Text>
           </View>
         )}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
         inverted
         style={styles.messageList}
       />
