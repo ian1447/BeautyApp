@@ -13,8 +13,6 @@ export default function Chat() {
   const { user, token } = useAuthStore();
 
   const goToChat = (id: string) => {
-    console.log(id);
-
     router.push(`/(chat)/${id}`);
   };
 

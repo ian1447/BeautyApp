@@ -14,8 +14,6 @@ export default function Chat() {
   const { user, token } = useAuthStore();
 
   const goToChat = (id: string) => {
-    console.log(id);
-
     router.push(`/(chat)/${id}`);
   };
 
@@ -33,8 +31,6 @@ export default function Chat() {
         }
       );
       const data = await resp.json();
-      console.log("data",data);
-      
       if (Array.isArray(data)) {
         setChatList(data);
       } else {

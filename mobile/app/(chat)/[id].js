@@ -63,7 +63,7 @@ export default function ChatPage() {
 
       const interval = setInterval(() => {
         GetChats();
-      }, 10000);
+      }, 5000);
 
       return () => clearInterval(interval);
     }, [])
@@ -117,7 +117,7 @@ export default function ChatPage() {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={30} color="black" />
         </TouchableOpacity>
-        <Text style={styles.beauticianName}>{messages[0].user_id.username}</Text>
+        <Text style={styles.beauticianName}>{user.role === "user" ? "messages[0].beautician_id?.name":"user"}</Text>
         <View style={{ width: 60 }} />
       </View>
 

@@ -78,7 +78,7 @@ router.get("/getlatest", protectRoute, async (req, res) => {
       },
       {
         $group: {
-          _id: "$beautician_id", 
+          _id: "$beautician_id",
           latestChat: { $first: "$$ROOT" }, 
         },
       },
