@@ -1,44 +1,50 @@
-import React, { useEffect } from "react";
-import {
-  View,
-  Text,
-  Dimensions,
-  StyleSheet,
-  Image,
-  FlatList,
-  TouchableOpacity,
-  ScrollView,
-  Button,
-} from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, Dimensions, StyleSheet, Image, FlatList, TouchableOpacity, ScrollView, Button } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuthStore } from "../../../store/authStore";
 import { API_URL } from "../../../constants/api";
+import { ActivityIndicator } from "react-native";
 
 const { width, height } = Dimensions.get("window");
-
-const images = [
-  {
-    id: "1",
-    uri: "https://images.unsplash.com/photo-1579353977828-2a4eab540b9a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c2FtcGxlfGVufDB8fDB8fHww",
-    description: "Modern beauty studio with premium tools and serene decor.",
-  },
-  {
-    id: "2",
-    uri: "https://plus.unsplash.com/premium_photo-1673765123739-3862ccaeb3d6?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8c2FtcGxlfGVufDB8fDB8fHww",
-    description: "Well-lit space ideal for facials, waxing, and skincare.",
-  },
-];
 
 export default function BeauticianProfile() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { id } = params;
   const { user, token } = useAuthStore();
+  const [beauticianWorks, setBeauticianWorks] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const GetWorks = async () => {
+    console.log("getting");
+
+    try {
+      const resp = await fetch(`${API_URL}/api/beauticianWorks/?beautician_id=${id}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await resp.json();
+      console.log(data);
+
+      if (Array.isArray(data)) {
+        setBeauticianWorks(data);
+      } else {
+        setBeauticianWorks([]);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
-    console.log(user.id);
-  });
+    GetWorks();
+    console.log(id);
+  }, []);
 
   const goToChat = (id: string) => {
     const InitialChat = async () => {
@@ -63,8 +69,7 @@ export default function BeauticianProfile() {
 
         const data = await response.json();
 
-        if (!response.ok)
-          throw new Error(data.message || "Something went wrong");
+        if (!response.ok) throw new Error(data.message || "Something went wrong");
         else {
           console.log("asdf", id);
           router.push(`/(chat)/${id}`);
@@ -76,14 +81,28 @@ export default function BeauticianProfile() {
     InitialChat();
   };
 
+  const handleScroll = (event) => {
+    const index = Math.round(event.nativeEvent.contentOffset.x / width);
+    setCurrentIndex(index);
+    const { contentOffset } = event.nativeEvent;
+    if (contentOffset.x <= 0) {
+      // user scrolled to far left
+      console.log("Reached left end");
+      triggerRefresh();
+    }
+  };
+
+  const triggerRefresh = async () => {
+    if (refreshing) return;
+    setRefreshing(true);
+    await GetWorks();
+    setRefreshing(false);
+  };
+
   const renderItem = ({ item }) => (
     <View>
       <View style={styles.imageContainer}>
-        <Image
-          source={{ uri: item.uri }}
-          style={styles.image}
-          resizeMode="cover"
-        />
+        <Image source={{ uri: item.image }} style={styles.image} resizeMode="cover" />
       </View>
       <View style={styles.textContainer}>
         <Text style={styles.imageDescription}>{item.description}</Text>
@@ -93,21 +112,26 @@ export default function BeauticianProfile() {
 
   return (
     <ScrollView style={styles.scrollcontainer}>
+      {refreshing && (
+        <View style={{ padding: 10, alignItems: "center" }}>
+          <Text style={{ marginBottom: 4 }}>Refreshing...</Text>
+          <ActivityIndicator size="small" color="#ff69b4" />
+        </View>
+      )}
       <View style={styles.container}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.push("/beautician")}
-        >
+        <TouchableOpacity style={styles.backButton} onPress={() => router.push("/beautician")}>
           <Ionicons name="arrow-back" size={30} color="black" />
         </TouchableOpacity>
 
         <FlatList
-          data={images}
+          data={beauticianWorks}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item._id}
           horizontal
           pagingEnabled
           showsHorizontalScrollIndicator={false}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
         />
 
         <View style={styles.divider} />
@@ -115,49 +139,21 @@ export default function BeauticianProfile() {
           <Text style={styles.sectionTitle}>Facility</Text>
           <View style={styles.bulletList}>
             <Text style={styles.bulletItem}>• Air-conditioned rooms</Text>
-            <Text style={styles.bulletItem}>
-              • Sanitized professional equipment
-            </Text>
+            <Text style={styles.bulletItem}>• Sanitized professional equipment</Text>
             <Text style={styles.bulletItem}>• Comfortable massage tables</Text>
-            <Text style={styles.bulletItem}>
-              • Soft lighting and relaxing music
-            </Text>
-            <Text style={styles.bulletItem}>
-              • Soft lighting and relaxing music
-            </Text>
-            <Text style={styles.bulletItem}>
-              • Soft lighting and relaxing music
-            </Text>
-            <Text style={styles.bulletItem}>
-              • Soft lighting and relaxing music
-            </Text>
-            <Text style={styles.bulletItem}>
-              • Soft lighting and relaxing music
-            </Text>
-            <Text style={styles.bulletItem}>
-              • Soft lighting and relaxing music
-            </Text>
-            <Text style={styles.bulletItem}>
-              • Soft lighting and relaxing music
-            </Text>
-            <Text style={styles.bulletItem}>
-              • Soft lighting and relaxing music
-            </Text>
-            <Text style={styles.bulletItem}>
-              • Soft lighting and relaxing music
-            </Text>
-            <Text style={styles.bulletItem}>
-              • Soft lighting and relaxing music
-            </Text>
-            <Text style={styles.bulletItem}>
-              • Soft lighting and relaxing music
-            </Text>
-            <Text style={styles.bulletItem}>
-              • Soft lighting and relaxing music
-            </Text>
-            <Text style={styles.bulletItem}>
-              • Soft lighting and relaxing music
-            </Text>
+            <Text style={styles.bulletItem}>• Soft lighting and relaxing music</Text>
+            <Text style={styles.bulletItem}>• Soft lighting and relaxing music</Text>
+            <Text style={styles.bulletItem}>• Soft lighting and relaxing music</Text>
+            <Text style={styles.bulletItem}>• Soft lighting and relaxing music</Text>
+            <Text style={styles.bulletItem}>• Soft lighting and relaxing music</Text>
+            <Text style={styles.bulletItem}>• Soft lighting and relaxing music</Text>
+            <Text style={styles.bulletItem}>• Soft lighting and relaxing music</Text>
+            <Text style={styles.bulletItem}>• Soft lighting and relaxing music</Text>
+            <Text style={styles.bulletItem}>• Soft lighting and relaxing music</Text>
+            <Text style={styles.bulletItem}>• Soft lighting and relaxing music</Text>
+            <Text style={styles.bulletItem}>• Soft lighting and relaxing music</Text>
+            <Text style={styles.bulletItem}>• Soft lighting and relaxing music</Text>
+            <Text style={styles.bulletItem}>• Soft lighting and relaxing music</Text>
           </View>
         </View>
 
@@ -170,18 +166,20 @@ export default function BeauticianProfile() {
 
         {/* Price and Book Button */}
         <View style={styles.bookingSection}>
-          <Text style={styles.price}>Price: $80</Text>
+          <Text style={styles.price}>
+            {beauticianWorks[currentIndex]?.amount != null
+              ? `₱${new Intl.NumberFormat("en-PH", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }).format(beauticianWorks[currentIndex].amount)}`
+              : "₱--"}
+          </Text>
+
           <View style={styles.buttonGroup}>
-            <TouchableOpacity
-              style={styles.secondaryButton}
-              onPress={() => goToChat(id)}
-            >
+            <TouchableOpacity style={styles.secondaryButton} onPress={() => goToChat(id)}>
               <Text style={styles.bookButtonText}>Chat</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.bookButton}
-              onPress={() => alert("Booked!")}
-            >
+            <TouchableOpacity style={styles.bookButton} onPress={() => alert("Booked!")}>
               <Text style={styles.bookButtonText}>Book</Text>
             </TouchableOpacity>
           </View>

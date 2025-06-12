@@ -5,9 +5,10 @@ import { useEffect, useState } from "react";
 import { API_URL } from "../../constants/api";
 import { useAuthStore } from "../../store/authStore";
 import { useFocusEffect } from "@react-navigation/native";
-import { useCallback } from 'react';
+import { useCallback } from "react";
 
 export default function Chat() {
+  const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
   const [chatList, setChatList] = useState([]);
   const { user, token } = useAuthStore();
@@ -19,18 +20,14 @@ export default function Chat() {
   const GetChats = async () => {
     const user_id = user.id;
     try {
-      const resp = await fetch(
-        `${API_URL}/api/chat/getlatest?user_id=${user_id}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const resp = await fetch(`${API_URL}/api/chat/getlatest?user_id=${user_id}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       const data = await resp.json();
-      console.log(data);
 
       if (Array.isArray(data)) {
         setChatList(data);
@@ -44,21 +41,34 @@ export default function Chat() {
 
   useFocusEffect(
     useCallback(() => {
-      GetChats(); // Run immediately on focus
+      GetChats();
 
       const interval = setInterval(() => {
         GetChats();
       }, 10000);
 
-      return () => clearInterval(interval); // Cleanup on blur/unfocus
+      return () => clearInterval(interval); 
     }, [])
   );
+
+  const onRefresh = async () => {
+    try {
+      setRefreshing(true);
+      await GetChats();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   return (
     <View style={styles.fullScreenContainer}>
       <FlatList
         data={chatList}
         keyExtractor={(item) => item.beautician_id._id}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() => goToChat(item.beautician_id._id)}
@@ -88,25 +98,14 @@ export default function Chat() {
                 marginRight: 12,
               }}
             >
-              <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                {item.beautician_id.name.charAt(0)}
-              </Text>
+              <Text style={{ fontSize: 18, fontWeight: "bold" }}>{item.beautician_id.name.charAt(0)}</Text>
             </View>
 
             {/* Text Section */}
             <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-                {item.beautician_id.name}
-              </Text>
-              <Text style={{ color: "#666", marginTop: 4 }}>
-                {item.chat_text}
-              </Text>
+              <Text style={{ fontSize: 16, fontWeight: "bold" }}>{item.beautician_id.name}</Text>
+              <Text style={{ color: "#666", marginTop: 4 }}>{item.chat_text}</Text>
             </View>
-
-            {/* Time */}
-            {/* <Text style={{ color: "#999", fontSize: 12, marginLeft: 8 }}>
-              {item.time}
-            </Text> */}
           </TouchableOpacity>
         )}
       />
