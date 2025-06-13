@@ -28,7 +28,7 @@ export default function Chat() {
         },
       });
       const data = await resp.json();
-
+      
       if (Array.isArray(data)) {
         setChatList(data);
       } else {
