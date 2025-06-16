@@ -49,6 +49,7 @@ router.get("/", protectRoute, async (req, res) => {
       beautician_id,
     })
       .populate("user_id", "username")
+      .populate("beautician_id", "name")
       .lean();
 
     res.send(chats);

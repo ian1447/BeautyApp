@@ -1,6 +1,7 @@
 import express from "express";
 import User from "../model/User.js";
 import jwt from "jsonwebtoken";
+import protectRoute from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
@@ -20,9 +21,7 @@ router.post("/register", async (req, res) => {
     }
 
     if (password.length < 6) {
-      return res
-        .status(400)
-        .json({ message: "Password must be greater than 6" });
+      return res.status(400).json({ message: "Password must be greater than 6" });
     }
 
     // const existingUser = await User.findOne({$or: [{email},{username}]});
@@ -59,7 +58,7 @@ router.post("/register", async (req, res) => {
         username: user.username,
         email: user.email,
         profileImage: user.profileImage,
-        role: user.role
+        role: user.role,
       },
     });
   } catch (error) {
@@ -75,20 +74,16 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password)
-      return res.status(400).json({ message: "All fields are required" });
+    if (!email || !password) return res.status(400).json({ message: "All fields are required" });
 
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "Invalid credential" });
 
     const isPasswordCorrect = await user.comparePassword(password);
-    if (!isPasswordCorrect)
-      return res.status(400).json({ message: "Invalid credential" });
+    if (!isPasswordCorrect) return res.status(400).json({ message: "Invalid credential" });
 
     const token = generateToken(user._id);
-    
-    console.log("asdasd",user);
-    
+
     res.status(201).json({
       token,
       user: {
@@ -97,7 +92,7 @@ router.post("/login", async (req, res) => {
         email: user.email,
         profileImage: user.profileImage,
         role: user.role,
-        beautician: user.beautician_id
+        beautician: user.beautician_id,
       },
     });
   } catch (error) {
@@ -105,6 +100,25 @@ router.post("/login", async (req, res) => {
     res.status(500).json({
       message: "Internal server error",
     });
+  }
+});
+
+router.get("/", protectRoute, async (req, res) => {
+  try {
+    const { id } = req.query;
+    if (!id) {
+      return res.status(400).json({ message: "Missing id" });
+    }
+
+    const user = await User.findOne({ _id: id }).lean();
+    if (user) {
+      res.send({ message: "Authenticated " });
+    } else {
+      res.send({ message: "No user found" });
+    }
+  } catch (error) {
+    console.log("Error getting user: ", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 

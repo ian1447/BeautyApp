@@ -77,7 +77,22 @@ export const useAuthStore = create((set) => ({
       const userJson = await AsyncStorage.getItem("user");
       const user = userJson ? JSON.parse(userJson) : null;
 
-      set({ token, user });
+      const resp = await fetch(`${API_URL}/api/auth/?id=${user?.id}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await resp.json();
+      
+      if (data?.message === "Token is not valid" || data?.message === "No user found" ) {
+        await AsyncStorage.removeItem("token");
+        await AsyncStorage.removeItem("user");
+        set({ token: null, user: null });
+      } else {
+        set({ token, user });
+      }
     } catch (error) {
       console.log("Auth Check failed", error.message);
     }

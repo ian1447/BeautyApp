@@ -1,15 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  Dimensions,
-  StyleSheet,
-  Image,
-  FlatList,
-  TouchableOpacity,
-  ScrollView,
-  Button,
-} from "react-native";
+import { View, Text, Dimensions, StyleSheet, Image, FlatList, TouchableOpacity, ScrollView, Button } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuthStore } from "../../../store/authStore";
@@ -17,6 +7,13 @@ import { API_URL } from "../../../constants/api";
 import { ActivityIndicator, RefreshControl } from "react-native";
 
 const { width, height } = Dimensions.get("window");
+
+const inclusions = [
+  "Air-conditioned rooms",
+  "Sanitized professional equipment",
+  "Comfortable massage tables",
+  "Soft lighting and relaxing music",
+];
 
 export default function BeauticianProfile() {
   const router = useRouter();
@@ -29,16 +26,13 @@ export default function BeauticianProfile() {
 
   const GetWorks = async () => {
     try {
-      const resp = await fetch(
-        `${API_URL}/api/beauticianWorks/?beautician_id=${id}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const resp = await fetch(`${API_URL}/api/beauticianWorks/?beautician_id=${id}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       const data = await resp.json();
 
       if (Array.isArray(data)) {
@@ -79,8 +73,7 @@ export default function BeauticianProfile() {
 
         const data = await response.json();
 
-        if (!response.ok)
-          throw new Error(data.message || "Something went wrong");
+        if (!response.ok) throw new Error(data.message || "Something went wrong");
         else {
           router.push(`/(chat)/${id}`);
         }
@@ -111,11 +104,7 @@ export default function BeauticianProfile() {
   const renderItem = ({ item }) => (
     <View>
       <View style={styles.imageContainer}>
-        <Image
-          source={{ uri: item.image }}
-          style={styles.image}
-          resizeMode="cover"
-        />
+        <Image source={{ uri: item.image }} style={styles.image} resizeMode="cover" />
       </View>
       <View style={styles.textContainer}>
         <Text style={styles.imageDescription}>{item.description}</Text>
@@ -127,20 +116,11 @@ export default function BeauticianProfile() {
     <ScrollView
       style={styles.scrollcontainer}
       refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={triggerRefresh}
-          colors={["#ff69b4"]} 
-          tintColor="#ff69b4" 
-          title="Refreshing..." 
-        />
+        <RefreshControl refreshing={refreshing} onRefresh={triggerRefresh} colors={["#ff69b4"]} tintColor="#ff69b4" title="Refreshing..." />
       }
     >
       <View style={styles.container}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.push("/beautician")}
-        >
+        <TouchableOpacity style={styles.backButton} onPress={() => router.push("/beautician")}>
           <Ionicons name="arrow-back" size={30} color="black" />
         </TouchableOpacity>
 
@@ -158,50 +138,11 @@ export default function BeauticianProfile() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Inclusions</Text>
           <View style={styles.bulletList}>
-            <Text style={styles.bulletItem}>• Air-conditioned rooms</Text>
-            <Text style={styles.bulletItem}>
-              • Sanitized professional equipment
-            </Text>
-            <Text style={styles.bulletItem}>• Comfortable massage tables</Text>
-            <Text style={styles.bulletItem}>
-              • Soft lighting and relaxing music
-            </Text>
-            <Text style={styles.bulletItem}>
-              • Soft lighting and relaxing music
-            </Text>
-            <Text style={styles.bulletItem}>
-              • Soft lighting and relaxing music
-            </Text>
-            <Text style={styles.bulletItem}>
-              • Soft lighting and relaxing music
-            </Text>
-            <Text style={styles.bulletItem}>
-              • Soft lighting and relaxing music
-            </Text>
-            <Text style={styles.bulletItem}>
-              • Soft lighting and relaxing music
-            </Text>
-            <Text style={styles.bulletItem}>
-              • Soft lighting and relaxing music
-            </Text>
-            <Text style={styles.bulletItem}>
-              • Soft lighting and relaxing music
-            </Text>
-            <Text style={styles.bulletItem}>
-              • Soft lighting and relaxing music
-            </Text>
-            <Text style={styles.bulletItem}>
-              • Soft lighting and relaxing music
-            </Text>
-            <Text style={styles.bulletItem}>
-              • Soft lighting and relaxing music
-            </Text>
-            <Text style={styles.bulletItem}>
-              • Soft lighting and relaxing music
-            </Text>
-            <Text style={styles.bulletItem}>
-              • Soft lighting and relaxing music
-            </Text>
+            {inclusions.map((item, index) => (
+              <Text key={index} style={styles.bulletItem}>
+                • {item}
+              </Text>
+            ))}
           </View>
         </View>
 
@@ -224,16 +165,10 @@ export default function BeauticianProfile() {
           </Text>
 
           <View style={styles.buttonGroup}>
-            <TouchableOpacity
-              style={styles.secondaryButton}
-              onPress={() => goToChat(id)}
-            >
+            <TouchableOpacity style={styles.secondaryButton} onPress={() => goToChat(id)}>
               <Text style={styles.bookButtonText}>Chat</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.bookButton}
-              onPress={() => alert("Booked!")}
-            >
+            <TouchableOpacity style={styles.bookButton} onPress={() => alert("Booked!")}>
               <Text style={styles.bookButtonText}>Book</Text>
             </TouchableOpacity>
           </View>

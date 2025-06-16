@@ -45,6 +45,7 @@ export default function ChatPage() {
         }
       );
       const data = await resp.json();
+      console.log(data);
       
       if (Array.isArray(data)) {
         setMessages(data);
@@ -117,7 +118,7 @@ export default function ChatPage() {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={30} color="black" />
         </TouchableOpacity>
-        <Text style={styles.beauticianName}>{user.role === "user" ? "messages[0].beautician_id?.name":"user"}</Text>
+        <Text style={styles.beauticianName}>{user.role === "user" ? messages[0].beautician_id?.name:messages[0].user_id?.username}</Text>
         <View style={{ width: 60 }} />
       </View>
 
