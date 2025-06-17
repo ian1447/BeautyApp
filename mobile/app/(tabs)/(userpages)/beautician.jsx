@@ -2,7 +2,7 @@ import { View, Text, Dimensions, FlatList, StyleSheet, Image, TouchableOpacity }
 import React, { useEffect, useState } from "react";
 import { API_URL } from "../../../constants/api";
 import { useAuthStore } from "../../../store/authStore";
-import { useRouter } from 'expo-router';
+import { useRouter } from "expo-router";
 
 const { width } = Dimensions.get("window"); // Get the screen width
 
@@ -10,27 +10,29 @@ export default function Beautician() {
   const router = useRouter();
   const { token } = useAuthStore();
   const [beauticians, setBeauticians] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const GetData = async () => {
+    try {
+      const resp = await fetch(`${API_URL}/api/beautician`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await resp.json();
+      if (Array.isArray(data)) {
+        setBeauticians(data);
+      } else {
+        setBeauticians([]);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
-    const GetData = async () => {
-      try {
-        const resp = await fetch(`${API_URL}/api/beautician`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        const data = await resp.json();
-        if (Array.isArray(data)) {
-          setBeauticians(data);
-        } else {
-          setBeauticians([]);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
     GetData();
   }, [beauticians]);
 
@@ -40,9 +42,21 @@ export default function Beautician() {
   // },[beauticians])
 
   const handlePress = (id) => {
-    router.push(`/${id}`);
+    const ts = Date.now();
+    router.push(`/${id}?reload=${ts}`);
   };
-  
+
+  const onRefresh = async () => {
+    try {
+      setRefreshing(true);
+      await GetData();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   const renderBeautician = ({ item }) => (
     <TouchableOpacity style={styles.beauticianItem} onPress={() => handlePress(item._id)}>
       <View style={styles.header}>
@@ -66,7 +80,7 @@ export default function Beautician() {
           <Text style={styles.noBeauticianText}>No active beauticians</Text>
         </View>
       ) : (
-        <FlatList data={beauticians} renderItem={renderBeautician} keyExtractor={(item) => item._id} />
+        <FlatList data={beauticians} renderItem={renderBeautician} keyExtractor={(item) => item._id} refreshing={refreshing} onRefresh={onRefresh} />
       )}
     </View>
   );

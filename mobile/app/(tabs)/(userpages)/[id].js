@@ -8,12 +8,7 @@ import { ActivityIndicator, RefreshControl } from "react-native";
 
 const { width, height } = Dimensions.get("window");
 
-const inclusions = [
-  "Air-conditioned rooms",
-  "Sanitized professional equipment",
-  "Comfortable massage tables",
-  "Soft lighting and relaxing music",
-];
+const inclusions = ["Air-conditioned rooms", "Sanitized professional equipment", "Comfortable massage tables", "Soft lighting and relaxing music"];
 
 export default function BeauticianProfile() {
   const router = useRouter();
@@ -23,6 +18,7 @@ export default function BeauticianProfile() {
   const [beauticianWorks, setBeauticianWorks] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [inclusions, setInclusions] = useState([]);
 
   const GetWorks = async () => {
     try {
@@ -45,10 +41,34 @@ export default function BeauticianProfile() {
     }
   };
 
+  const GetInclusions = async () => {
+    try {
+      const resp = await fetch(`${API_URL}/api/beauticianInclusions/?beautician_id=${id}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      
+    
+      const data= await resp.json();
+      console.log(data);
+
+      if (Array.isArray(data)) {
+        setInclusions(data);
+      } else {
+        setInclusions([]);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     GetWorks();
-    console.log(id);
-  }, []);
+    GetInclusions();
+  }, [params.id, params.reload]);
 
   const goToChat = (id: string) => {
     const InitialChat = async () => {
@@ -84,15 +104,15 @@ export default function BeauticianProfile() {
     InitialChat();
   };
 
-  // const handleScroll = (event) => {
-  //   const index = Math.round(event.nativeEvent.contentOffset.x / width);
-  //   setCurrentIndex(index);
-  //   const { contentOffset } = event.nativeEvent;
-  //   if (contentOffset.x <= 0) {
-  //     // user scrolled to far left
-  //     triggerRefresh();
-  //   }
-  // };
+  const handleScroll = (event) => {
+    const index = Math.round(event.nativeEvent.contentOffset.x / width);
+    setCurrentIndex(index);
+    // const { contentOffset } = event.nativeEvent;
+    // if (contentOffset.x <= 0) {
+    //   // user scrolled to far left
+    //   triggerRefresh();
+    // }
+  };
 
   const triggerRefresh = async () => {
     if (refreshing) return;
@@ -132,6 +152,7 @@ export default function BeauticianProfile() {
           pagingEnabled
           showsHorizontalScrollIndicator={false}
           scrollEventThrottle={16}
+          onScroll={handleScroll}
         />
 
         <View style={styles.divider} />
@@ -140,7 +161,7 @@ export default function BeauticianProfile() {
           <View style={styles.bulletList}>
             {inclusions.map((item, index) => (
               <Text key={index} style={styles.bulletItem}>
-                • {item}
+                • {item.description}
               </Text>
             ))}
           </View>
