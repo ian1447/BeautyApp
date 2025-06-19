@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Dimensions, StyleSheet, Image, FlatList, TouchableOpacity, ScrollView, Button } from "react-native";
+import { View, Text, Dimensions, StyleSheet, Image, FlatList, TouchableOpacity, ScrollView, Button, Modal } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuthStore } from "../../../store/authStore";
 import { API_URL } from "../../../constants/api";
 import { ActivityIndicator, RefreshControl } from "react-native";
+import DatePicker from "expo-datepicker";
 
 const { width, height } = Dimensions.get("window");
 
@@ -19,6 +20,8 @@ export default function BeauticianProfile() {
   const [refreshing, setRefreshing] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [inclusions, setInclusions] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   const GetWorks = async () => {
     try {
@@ -50,9 +53,8 @@ export default function BeauticianProfile() {
           "Content-Type": "application/json",
         },
       });
-      
-    
-      const data= await resp.json();
+
+      const data = await resp.json();
       console.log(data);
 
       if (Array.isArray(data)) {
@@ -69,6 +71,11 @@ export default function BeauticianProfile() {
     GetWorks();
     GetInclusions();
   }, [params.id, params.reload]);
+
+  useEffect(()=> {
+    console.log(selectedDate);
+    
+  }, [selectedDate])
 
   const goToChat = (id: string) => {
     const InitialChat = async () => {
@@ -189,12 +196,45 @@ export default function BeauticianProfile() {
             <TouchableOpacity style={styles.secondaryButton} onPress={() => goToChat(id)}>
               <Text style={styles.bookButtonText}>Chat</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.bookButton} onPress={() => alert("Booked!")}>
+            <TouchableOpacity style={styles.bookButton} onPress={() => setModalVisible(true)} style={styles.bookButton}>
               <Text style={styles.bookButtonText}>Book</Text>
             </TouchableOpacity>
           </View>
         </View>
       </View>
+      <Modal visible={modalVisible} transparent animationType="slide">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Choose Date & Time</Text>
+
+            <DatePicker
+              // date={selectedDate instanceof Date ? selectedDate : new Date()}
+              onChange={(date) => setSelectedDate(date)}
+              mode="datetime"
+              locale="en"
+              fadeToColor="none"
+              androidVariant="iosClone"
+            />
+
+            <Text style={styles.selectedText}>Selected: {selectedDate.toLocaleString()}</Text>
+
+            <View style={styles.actionButtons}>
+              <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.cancelButton}>
+                <Text style={{ color: "#fff" }}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  alert("Booking confirmed for " + selectedDate.toLocaleString());
+                  setModalVisible(false);
+                }}
+                style={styles.confirmButton}
+              >
+                <Text style={{ color: "#fff" }}>Confirm</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
@@ -303,5 +343,52 @@ const styles = StyleSheet.create({
   buttonGroup: {
     flexDirection: "row",
     gap: 10,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContainer: {
+    width: "85%",
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  modalText: {
+    fontSize: 16,
+    marginVertical: 5,
+  },
+  dateButton: {
+    backgroundColor: "#ff69b4",
+    padding: 10,
+    borderRadius: 8,
+    marginTop: 10,
+    alignItems: "center",
+  },
+  dateButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  cancelButton: {
+    backgroundColor: "#999",
+    padding: 10,
+    borderRadius: 8,
+    width: "45%",
+    alignItems: "center",
+  },
+  confirmButton: {
+    backgroundColor: "#ff69b4",
+    padding: 10,
+    borderRadius: 8,
+    width: "45%",
+    alignItems: "center",
   },
 });

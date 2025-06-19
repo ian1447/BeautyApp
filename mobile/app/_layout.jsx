@@ -20,7 +20,7 @@ export default function RootLayout() {
     const isSignedIn = user && token;
     // console.log("user",user);
     // console.log("token",token);
-    // console.log("isSignedIn",isSignedIn);
+    //  console.log("isSignedIn",isSignedIn);
     
 
     if (!isSignedIn && !inAuthScreen) router.replace("/(auth)");
