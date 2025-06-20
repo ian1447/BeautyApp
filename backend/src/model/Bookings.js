@@ -5,12 +5,9 @@ const bookingSchema = new mongoose.Schema(
   {
     beautician_id: { type: Schema.Types.ObjectId, ref: "Beautician" },
     ubooker_id: { type: Schema.Types.ObjectId, ref: "User" },
-    date: {
+    beauticianWork_id: { type: Schema.Types.ObjectId, ref: "User" },
+    datetime: {
       type: Date,
-      required: true,
-    },
-    description: {
-      type: String,
       required: true,
     },
     status: {

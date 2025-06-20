@@ -8,31 +8,33 @@ const router = express.Router();
 // update
 // delete
 
-// router.post("/", protectRoute, async (req, res) => {
-//   try {
-//     const { chat_text, beautician_id, user_id, sender } = req.body;
+router.post("/", protectRoute, async (req, res) => {
+  try {
+    const { beautician_id, ubooker_id, beauticianWork_id, datetime, status, amount } = req.body;
 
-//     if (!chat_text || !beautician_id || !user_id || !sender)
-//       res
-//         .status(400)
-//         .json({ message: "Please Provide all necessary details." });
+    if (!beautician_id || !ubooker_id || !beauticianWork_id || !datetime || !status || !amount)
+      res
+        .status(400)
+        .json({ message: "Please Provide all necessary details." });
 
-//     const newchat = new Chat({
-//       chat_text,
-//       beautician_id,
-//       user_id,
-//       sender,
-//     });
+    const newBooking = new Booking({
+      beautician_id,
+      ubooker_id,
+      beauticianWork_id,
+      datetime,
+      status, 
+      amount
+    });
 
-//     await newchat.save();
+    await newBooking.save();
 
-//     res.status(201).json({ newchat });
-//   } catch (error) {
-//     console.log("error", error);
+    res.status(201).json({ newBooking });
+  } catch (error) {
+    console.log("error", error);
 
-//     res.status(500).json({ message: error.message });
-//   }
-// });
+    res.status(500).json({ message: error.message });
+  }
+});
 
 // router.get("/", protectRoute, async (req, res) => {
 //   try {
@@ -66,22 +68,6 @@ const router = express.Router();
 //   } catch (error) {
 //     console.log("Error getting user books: ", error);
 //     res.status(500).json({ message: "Internal server error" });
-//   }
-// });
-
-// router.delete("/:id", protectRoute, async (req, res) => {
-//   try {
-//     const book = await Book.findById(req.params.id);
-//     if (!book) return res.status(401).json({ message: "Book not found" });
-
-//     if (book.user.toString() !== req.user._id.toString()) return res.status(401).json({ message: "cannot delete book" });
-
-//     await Book.deleteOne();
-
-//     res.json({ message: "Deleted Successfully" });
-//   } catch (error) {
-//     console.log("error", error);
-//     return res.status(500).json({ message: "Internal server errro" });
 //   }
 // });
 
