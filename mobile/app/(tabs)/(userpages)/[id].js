@@ -1,16 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  Dimensions,
-  StyleSheet,
-  Image,
-  FlatList,
-  TouchableOpacity,
-  ScrollView,
-  Button,
-  Modal,
-} from "react-native";
+import { View, Text, Dimensions, StyleSheet, Image, FlatList, TouchableOpacity, ScrollView, Button, Modal } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuthStore } from "../../../store/authStore";
@@ -20,12 +9,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 
 const { width, height } = Dimensions.get("window");
 
-const inclusions = [
-  "Air-conditioned rooms",
-  "Sanitized professional equipment",
-  "Comfortable massage tables",
-  "Soft lighting and relaxing music",
-];
+const inclusions = ["Air-conditioned rooms", "Sanitized professional equipment", "Comfortable massage tables", "Soft lighting and relaxing music"];
 
 export default function BeauticianProfile() {
   const router = useRouter();
@@ -44,16 +28,13 @@ export default function BeauticianProfile() {
 
   const GetWorks = async () => {
     try {
-      const resp = await fetch(
-        `${API_URL}/api/beauticianWorks/?beautician_id=${id}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const resp = await fetch(`${API_URL}/api/beauticianWorks/?beautician_id=${id}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       const data = await resp.json();
 
       if (Array.isArray(data)) {
@@ -68,16 +49,13 @@ export default function BeauticianProfile() {
 
   const GetInclusions = async () => {
     try {
-      const resp = await fetch(
-        `${API_URL}/api/beauticianInclusions/?beautician_id=${id}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const resp = await fetch(`${API_URL}/api/beauticianInclusions/?beautician_id=${id}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       const data = await resp.json();
       console.log(data);
@@ -137,8 +115,7 @@ export default function BeauticianProfile() {
 
         const data = await response.json();
 
-        if (!response.ok)
-          throw new Error(data.message || "Something went wrong");
+        if (!response.ok) throw new Error(data.message || "Something went wrong");
         else {
           router.push(`/(chat)/${id}`);
         }
@@ -169,11 +146,7 @@ export default function BeauticianProfile() {
   const renderItem = ({ item }) => (
     <View>
       <View style={styles.imageContainer}>
-        <Image
-          source={{ uri: item.image }}
-          style={styles.image}
-          resizeMode="cover"
-        />
+        <Image source={{ uri: item.image }} style={styles.image} resizeMode="cover" />
       </View>
       <View style={styles.textContainer}>
         <Text style={styles.imageDescription}>{item.description}</Text>
@@ -185,20 +158,11 @@ export default function BeauticianProfile() {
     <ScrollView
       style={styles.scrollcontainer}
       refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={triggerRefresh}
-          colors={["#ff69b4"]}
-          tintColor="#ff69b4"
-          title="Refreshing..."
-        />
+        <RefreshControl refreshing={refreshing} onRefresh={triggerRefresh} colors={["#ff69b4"]} tintColor="#ff69b4" title="Refreshing..." />
       }
     >
       <View style={styles.container}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.push("/beautician")}
-        >
+        <TouchableOpacity style={styles.backButton} onPress={() => router.push("/beautician")}>
           <Ionicons name="arrow-back" size={30} color="black" />
         </TouchableOpacity>
 
@@ -244,17 +208,10 @@ export default function BeauticianProfile() {
           </Text>
 
           <View style={styles.buttonGroup}>
-            <TouchableOpacity
-              style={styles.secondaryButton}
-              onPress={() => goToChat(id)}
-            >
+            <TouchableOpacity style={styles.secondaryButton} onPress={() => goToChat(id)}>
               <Text style={styles.bookButtonText}>Chat</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.bookButton}
-              onPress={() => setModalVisible(true)}
-              style={styles.bookButton}
-            >
+            <TouchableOpacity style={styles.bookButton} onPress={() => setModalVisible(true)} style={styles.bookButton}>
               <Text style={styles.bookButtonText}>Book</Text>
             </TouchableOpacity>
           </View>
@@ -263,9 +220,7 @@ export default function BeauticianProfile() {
       <Modal visible={modalVisible} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>
-              Select Date and Time for Booking:
-            </Text>
+            <Text style={styles.modalTitle}>Select Date and Time for Booking:</Text>
 
             {showDatePicker && (
               <DateTimePicker
@@ -295,34 +250,34 @@ export default function BeauticianProfile() {
               />
             )}
 
-            <Button title="Pick Date" onPress={() => setShowDatePicker(true)} />
-            <Button title="Pick Time" onPress={() => setShowTimePicker(true)} />
+            <View style={styles.datetimeRow}>
+              <TouchableOpacity style={styles.datetimeButton} onPress={() => setShowDatePicker(true)}>
+                <Text style={{ color: "#fff" }}>Pick Date</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.datetimeButton} onPress={() => setShowTimePicker(true)}>
+                <Text style={{ color: "#fff" }}>Pick Time</Text>
+              </TouchableOpacity>
+            </View>
 
             <Text style={styles.selectedText}>
-              Selected:{" "}
-              {getCombinedDateTime().toLocaleDateString("en-US", {
+              <Text style={styles.selectedLabel}>Selected:</Text>{" "}
+              {getCombinedDateTime().toLocaleString("en-US", {
                 year: "numeric",
-                month: "short", // "short" = "Jan", "Feb", etc.
+                month: "short",
                 day: "2-digit",
-                hour: "numeric", // 12-hour format
+                hour: "numeric",
                 minute: "2-digit",
                 hour12: true,
               })}
             </Text>
 
             <View style={styles.actionButtons}>
-              <TouchableOpacity
-                onPress={() => setModalVisible(false)}
-                style={styles.cancelButton}
-              >
+              <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.cancelButton}>
                 <Text style={{ color: "#fff" }}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
-                  alert(
-                    "Booking confirmed for " +
-                      getCombinedDateTime().toLocaleString()
-                  );
+                  alert("Booking confirmed for " + getCombinedDateTime().toLocaleString());
                   setModalVisible(false);
                 }}
                 style={styles.confirmButton}
@@ -479,20 +434,49 @@ const styles = StyleSheet.create({
     backgroundColor: "#999",
     padding: 10,
     borderRadius: 8,
-    width: "45%",
+    width: "30%",
     alignItems: "center",
   },
   confirmButton: {
     backgroundColor: "#ff69b4",
     padding: 10,
     borderRadius: 8,
-    width: "45%",
+    width: "65%",
+    alignItems: "center",
+  },
+  datetimeRow: {
+    flexDirection: "row",
+    // justifyContent: "space-between",
+    gap: 5,
+    marginTop: 10,
+  },
+  datetimeButton: {
+    backgroundColor: "#ff69b4",
+    padding: 10,
+    borderRadius: 8,
+    margin: 3,
+    width: "48%",
     alignItems: "center",
   },
   selectedText: {
-    marginTop: 10,
-    fontSize: 20,
-    fontWeight: "bold",
+    marginTop: 15,
+    fontSize: 16,
+    color: "#333",
     textAlign: "center",
+    paddingVertical: 8,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
+  actionButtons: {
+    flexDirection: "row",
+    gap: 13,
+    // justifyContent: "space-between",
+    marginTop: 20,
+  },
+  selectedLabel: {
+    fontWeight: "bold",
+    color: "#555",
   },
 });
