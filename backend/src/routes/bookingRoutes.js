@@ -10,9 +10,23 @@ const router = express.Router();
 
 router.post("/", protectRoute, async (req, res) => {
   try {
-    const { beautician_id, ubooker_id, beauticianWork_id, datetime, status, amount } = req.body;
+    const {
+      beautician_id,
+      ubooker_id,
+      beauticianWork_id,
+      datetime,
+      status,
+      amount,
+    } = req.body;
 
-    if (!beautician_id || !ubooker_id || !beauticianWork_id || !datetime || !status || !amount)
+    if (
+      !beautician_id ||
+      !ubooker_id ||
+      !beauticianWork_id ||
+      !datetime ||
+      !status ||
+      !amount
+    )
       res
         .status(400)
         .json({ message: "Please Provide all necessary details." });
@@ -22,8 +36,8 @@ router.post("/", protectRoute, async (req, res) => {
       ubooker_id,
       beauticianWork_id,
       datetime,
-      status, 
-      amount
+      status,
+      amount,
     });
 
     await newBooking.save();
@@ -36,29 +50,50 @@ router.post("/", protectRoute, async (req, res) => {
   }
 });
 
-// router.get("/", protectRoute, async (req, res) => {
-//   try {
-//     const { user_id, beautician_id } = req.query;
+router.get("/user", protectRoute, async (req, res) => {
+  try {
+    const { ubooker_id } = req.query;
+    
+    if (!ubooker_id) {
+      return res.status(400).json({ message: "Missing ubooker_id" });
+    }
 
-//     if (!user_id || !beautician_id) {
-//       return res
-//         .status(400)
-//         .json({ message: "Missing user_id or beautician_id" });
-//     }
+    const bookings = await Booking.find({
+      ubooker_id,
+    })
+      .populate("ubooker_id")
+      .populate("beautician_id")
+      .populate("beauticianWork_id")
+      .lean();
 
-//     const chats = await Chat.find({
-//       user_id,
-//       beautician_id,
-//     })
-//       .populate("user_id", "username")
-//       .lean();
+    res.send(bookings);
+  } catch (error) {
+    console.log("Error getting Bookings: ", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
-//     res.send(chats);
-//   } catch (error) {
-//     console.log("Error getting Chats: ", error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// });
+router.get("/admin", protectRoute, async (req, res) => {
+  try {
+    const { beautician_id } = req.query;
+    
+    if (!beautician_id) {
+      return res.status(400).json({ message: "Missing beautician_id" });
+    }
+
+    const bookings = await Booking.find({
+      beautician_id,
+    })
+      .populate("beautician_id")
+      .populate("ubooker_id")
+      .lean();
+
+    res.send(bookings);
+  } catch (error) {
+    console.log("Error getting Bookings: ", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 // router.get("/user", protectRoute, async (req, res) => {
 //   try {
