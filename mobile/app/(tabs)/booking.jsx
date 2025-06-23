@@ -1,10 +1,4 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  RefreshControl,
-} from "react-native";
+import { View, Text, StyleSheet, ScrollView, RefreshControl } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useAuthStore } from "../../store/authStore";
 import { API_URL } from "../../constants/api";
@@ -78,20 +72,17 @@ export default function Booking() {
 
   const GetBookings = async () => {
     try {
-      const resp = await fetch(
-        `${API_URL}/api/booking/user?ubooker_id=${user.id}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const resp = await fetch(`${API_URL}/api/booking/user?ubooker_id=${user.id}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       const data = await resp.json();
       // console.log(data);
       console.log(data[0].beauticianWork_id);
-      
+
       if (Array.isArray(data)) {
         setBookings(data);
       } else {
@@ -106,22 +97,30 @@ export default function Booking() {
     GetBookings();
   }, []);
 
-  const sortedBookings = [...bookings].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
+  const sortedBookings = [...bookings].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   const onRefresh = async () => {
     setRefreshing(true);
     await GetBookings();
     setRefreshing(false);
   };
+
+  const extractDateOnly = (datetime) => {
+    const date = new Date(datetime); // convert string → Date
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  };
+
+  const extractTimeOnly = (datetime) => {
+    const date = new Date(datetime); // convert to Date object if it's a string
+    return date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
+
   return (
-    <ScrollView
-      style={styles.container}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
+    <ScrollView style={styles.container} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
       {sortedBookings.map((booking, index) => (
         <View key={index} style={styles.bookingBox}>
           <Text style={styles.title}>{booking.description}</Text>
@@ -129,34 +128,39 @@ export default function Booking() {
           {/* Name and Date Section */}
           <View style={styles.infoSection}>
             <Text style={styles.infoLabel}>Name:</Text>
-            <Text style={styles.infoText}>{booking.name}</Text>
+            <Text style={styles.infoText}>{booking.ubooker_id.username}</Text>
           </View>
           <View style={styles.infoSection}>
             <Text style={styles.infoLabel}>Date:</Text>
-            <Text style={styles.infoText}>{booking.date}</Text>
+            <Text style={styles.infoText}>
+              {extractDateOnly(booking.datetime).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "2-digit",
+              })}
+            </Text>
           </View>
 
           {/* Time and Beautician Section */}
           <View style={styles.infoSection}>
             <Text style={styles.infoLabel}>Time:</Text>
-            <Text style={styles.infoText}>{booking.time}</Text>
+            <Text style={styles.infoText}>{extractTimeOnly(booking.datetime)}</Text>
           </View>
           <View style={styles.infoSection}>
             <Text style={styles.infoLabel}>Beautician:</Text>
-            <Text style={styles.infoText}>{booking.beauticianName}</Text>
+            <Text style={styles.infoText}>{booking.beautician_id?.name}</Text>
           </View>
 
           <View style={styles.infoSection}>
             <Text style={styles.infoLabel}>Amount:</Text>
-            <Text style={styles.infoText}>{booking.amount}</Text>
+            <Text style={styles.infoText}>{`₱${new Intl.NumberFormat("en-PH", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }).format(booking.amount)}`}</Text>
           </View>
 
           {/* Status Section */}
-          <Text
-            style={[styles.status, { color: getStatusColor(booking.status) }]}
-          >
-            Status: {booking.status}
-          </Text>
+          <Text style={[styles.status, { color: getStatusColor(booking.status) }]}>Status: {booking.status}</Text>
         </View>
       ))}
     </ScrollView>
@@ -197,10 +201,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#333",
     width: 100,
+    fontSize: 18,
   },
   infoText: {
     color: "#555",
     flex: 1,
+    fontWeight: "bold",
+    fontSize: 15,
   },
   status: {
     fontWeight: "bold",

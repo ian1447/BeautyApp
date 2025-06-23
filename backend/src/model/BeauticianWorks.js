@@ -22,6 +22,6 @@ const beauticianworksSchema = new mongoose.Schema(
   }
 );
 
-const BeauticianWorks = mongoose.model("BeauticianWorks", beauticianworksSchema);
+const BeauticianWorks = mongoose.model("BeauticianWork", beauticianworksSchema);
 
 export default BeauticianWorks;
