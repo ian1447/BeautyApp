@@ -88,14 +88,14 @@ export default function Chat() {
               }}
             >
               <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                {item.user_id.username.charAt(0)}
+                {item?.user_id?.username?.charAt(0)}
               </Text>
             </View>
 
             {/* Text Section */}
             <View style={{ flex: 1 }}>
               <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-                {item.user_id.username}
+                {item?.user_id?.username}
               </Text>
               <Text style={{ color: "#666", marginTop: 4 }}>
                 {item.chat_text}

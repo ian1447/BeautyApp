@@ -73,7 +73,7 @@ export default function Beautician() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerText}>Beauticians</Text>
+      <Text style={styles.headerText}>Hair and Makeup Artists</Text>
 
       {beauticians?.length === 0 ? (
         <View style={styles.noBeauticianCard}>
