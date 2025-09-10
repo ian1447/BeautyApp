@@ -158,6 +158,10 @@ export default function BeauticianProfile() {
     setRefreshing(false);
   };
 
+  const goToCamera = () => {
+    router.push("/camera"); // 👈 navigate to camera.jsx
+  };
+
   const handleBooking = () => {
     const BookBeautician = async () => {
       try {
@@ -190,6 +194,7 @@ export default function BeauticianProfile() {
         else {
           setModalVisible(false);
           alert("Booked successfully!");
+          goToCamera();
         }
 
         // if (!response.ok)
@@ -292,7 +297,6 @@ export default function BeauticianProfile() {
             <TouchableOpacity
               style={styles.bookButton}
               onPress={() => setModalVisible(true)}
-              style={styles.bookButton}
             >
               <Text style={styles.bookButtonText}>Book</Text>
             </TouchableOpacity>
@@ -361,6 +365,15 @@ export default function BeauticianProfile() {
                 hour12: true,
               })}
             </Text>
+
+             {/* <View style={styles.actionButtons}>
+              <TouchableOpacity
+                onPress={goToCamera}
+                style={styles.confirmButton}
+              >
+                <Text style={{ color: "#fff" }}>Open Camera</Text>
+              </TouchableOpacity>
+             </View> */}
 
             <View style={styles.actionButtons}>
               <TouchableOpacity
